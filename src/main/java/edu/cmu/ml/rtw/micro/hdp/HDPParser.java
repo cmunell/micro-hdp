@@ -1,16 +1,29 @@
 package edu.cmu.ml.rtw.micro.hdp;
 
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import edu.cmu.ml.rtw.generic.data.annotation.AnnotationType;
 import edu.cmu.ml.rtw.generic.data.annotation.nlp.AnnotationTypeNLP;
 import edu.cmu.ml.rtw.generic.data.annotation.nlp.AnnotationTypeNLP.Target;
-import edu.cmu.ml.rtw.generic.model.annotator.nlp.AnnotatorTokenSpan;
+import edu.cmu.ml.rtw.generic.model.annotator.nlp.AnnotatorSentence;
 import edu.cmu.ml.rtw.generic.data.annotation.nlp.DocumentNLP;
 import edu.cmu.ml.rtw.generic.data.annotation.nlp.TokenSpan;
-import edu.cmu.ml.rtw.generic.util.Triple;
+import edu.cmu.ml.rtw.generic.util.Pair;
+import edu.cmu.ml.rtw.micro.hdp.NarSystem;
 
-public class HDPParser implements AnnotatorTokenSpan<String> {
+/**
+ * TODO: Instead of returning a string for each annotation
+ * (serialized semantic and syntactic structures), create
+ * a serializable Java structure that holds the information.
+ *
+ * TODO: Move the KB, ontology gz, and possibly the HDP
+ * files into /nell/data/micro/.
+ *
+ * TODO: Move the grammar file into the resources directory
+ * of this repository.
+ */
+public class HDPParser implements AnnotatorSentence<String> {
 	private static final AnnotationType<?>[] REQUIRED_ANNOTATIONS = new AnnotationType<?>[] {
 		AnnotationTypeNLP.SENTENCE
 
@@ -18,7 +31,8 @@ public class HDPParser implements AnnotatorTokenSpan<String> {
 		//AnnotationTypeNLP.DEPENDENCY_PARSE
 	};
 
-	private static final AnnotationTypeNLP<String> SEMANTIC_PARSE = new AnnotationTypeNLP<String>("hdp-parse", String.class, Target.SENTENCE);
+	public static final AnnotationTypeNLP<String> SEMANTIC_PARSE = new AnnotationTypeNLP<String>("hdp-parse", String.class, Target.SENTENCE);
+
 	private static final String DEFAULT_KB_PATH = "/home/asaparov/SVOReader/NELL.08m.905.esv.csv.gz";
 	private static final String DEFAULT_ONTOLOGY_PATH = "/home/asaparov/SVOReader/NELL.08m.905.ontology.csv.gz";
 	private static final String DEFAULT_GRAMMAR_PATH = "/home/asaparov/SVOReader/correlated_svo_with_prepositions.gram";
@@ -40,12 +54,15 @@ public class HDPParser implements AnnotatorTokenSpan<String> {
 	}
 
 	private HDPParser(String initScript, String hdpDirectory, int memoryLimitGB) {
-		System.loadLibrary("libsvo_reader");
+		System.loadLibrary("z");
+		System.loadLibrary("svo_reader");
+		NarSystem.loadLibrary();
 		if (!initialize(initScript, hdpDirectory, memoryLimitGB))
 			throw new IllegalStateException("Unable to initialize parser.");
 	}
 
 	private native boolean initialize(String initScript, String hdpDirectory, int memoryLimitGB);
+	private native Pair<String, Double> annotate(String sentence, String rootSymbol, int k);
 
 	@Override
 	public String getName() {
@@ -68,8 +85,16 @@ public class HDPParser implements AnnotatorTokenSpan<String> {
 	}
 
 	@Override
-	public List<Triple<TokenSpan, String, Double>> annotate(DocumentNLP document) {
-		return null;
+	public Map<Integer, Pair<String, Double>> annotate(DocumentNLP document) {
+		HashMap<Integer, Pair<String, Double>> annotations = new HashMap<Integer, Pair<String, Double>>();
+		for (int i = 0; i < document.getSentenceCount(); i++) {
+			String sentence = document.getSentence(i).replace(" .", "").toLowerCase();
+			if (sentence.split("\\s+").length > 8)
+				continue;
+			Pair<String, Double> annotation = annotate(sentence, "S", 1);
+			if (annotation != null)
+				annotations.put(i, annotation);
+		}
+		return annotations;
 	}
 }
-
