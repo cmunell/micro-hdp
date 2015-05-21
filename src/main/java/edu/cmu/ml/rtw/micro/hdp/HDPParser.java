@@ -54,7 +54,6 @@ public class HDPParser implements AnnotatorSentence<String> {
 	}
 
 	private HDPParser(String initScript, String hdpDirectory, int memoryLimitGB) {
-		System.loadLibrary("z");
 		System.loadLibrary("svo_reader");
 		NarSystem.loadLibrary();
 		if (!initialize(initScript, hdpDirectory, memoryLimitGB))
