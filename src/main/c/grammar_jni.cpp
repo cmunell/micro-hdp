@@ -20,7 +20,7 @@ char* parse_sentence(const char* sentence, const char* root_nonterminal, unsigne
 JNIEXPORT jboolean JNICALL Java_edu_cmu_ml_rtw_micro_hdp_HDPParser_initialize(
 		JNIEnv* env, jobject obj, jstring init_script, jstring hdp_directory, jint memory_lim)
 {
-	set_memory_limit(memory_lim);
+	set_memory_limit((memory_lim < 0) ? 0 : memory_lim);
 
 	const char* data_path = env->GetStringUTFChars(hdp_directory, 0);
 	if (data_path == NULL) {
