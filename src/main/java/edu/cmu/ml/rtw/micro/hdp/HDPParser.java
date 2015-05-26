@@ -31,7 +31,7 @@ public class HDPParser implements AnnotatorSentence<String> {
 		//AnnotationTypeNLP.DEPENDENCY_PARSE
 	};
 
-	public static final AnnotationTypeNLP<String> SEMANTIC_PARSE = new AnnotationTypeNLP<String>("hdp-parse", String.class, Target.SENTENCE);
+	public static final AnnotationTypeNLP<String> SEMANTIC_PARSE = new AnnotationTypeNLP<String>("nell-hdp", String.class, Target.SENTENCE);
 
 	private static final String DEFAULT_KB_PATH = "/home/asaparov/SVOReader/NELL.08m.905.esv.csv.gz";
 	private static final String DEFAULT_ONTOLOGY_PATH = "/home/asaparov/SVOReader/NELL.08m.905.ontology.csv.gz";
@@ -64,7 +64,7 @@ public class HDPParser implements AnnotatorSentence<String> {
 
 	@Override
 	public String getName() {
-		return "micro-hdp";
+		return "cmunell_hdp-0.0.1";
 	}
 
 	@Override
