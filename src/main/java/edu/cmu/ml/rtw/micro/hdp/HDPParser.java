@@ -87,7 +87,7 @@ public class HDPParser implements AnnotatorSentence<String> {
 		HashMap<Integer, Pair<String, Double>> annotations = new HashMap<Integer, Pair<String, Double>>();
 		for (int i = 0; i < document.getSentenceCount(); i++) {
 			String sentence = document.getSentence(i).replace(" .", "").toLowerCase();
-			if (sentence.split("\\s+").length > 8)
+			if (sentence.split("\\s+").length > 12)
 				continue;
 			Pair<String, Double> annotation = annotate(sentence, "S", 1);
 			if (annotation != null)
