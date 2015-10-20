@@ -35,8 +35,8 @@ public class HDPParser implements AnnotatorSentence<String> {
 
 	private static final String DEFAULT_KB_PATH = "/home/asaparov/SVOReader/NELL.08m.905.esv.csv.gz";
 	private static final String DEFAULT_ONTOLOGY_PATH = "/home/asaparov/SVOReader/NELL.08m.905.ontology.csv.gz";
-	private static final String DEFAULT_GRAMMAR_PATH = "/home/asaparov/SVOReader/correlated_svo_with_prepositions.gram";
-	private static final String DEFAULT_HDP_DIRECTORY = "/home/asaparov/SVOReader/data_correlated";
+	private static final String DEFAULT_GRAMMAR_PATH = "/home/asaparov/SVOReader/verb_morphology.gram";
+	private static final String DEFAULT_HDP_DIRECTORY = "/home/asaparov/SVOReader/data";
 	private static final int DEFAULT_MEMORY_LIMIT = 0; /* in gigabytes; OS will kill the program if this limit is exceeded (zero is infinite) */
 
 	private static class Singleton {
