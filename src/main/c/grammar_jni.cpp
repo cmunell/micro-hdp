@@ -9,12 +9,34 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <io.h>
 
 extern "C" {
-void run_console(FILE* input, const char* prompt);
+void run_console_file(FILE* input, const char* prompt);
+void run_console_memory(memory_stream& input, const char* prompt);
 void set_memory_limit(long unsigned int new_limit);
 void set_data_path(const char* new_path);
 char* parse_sentence(const char* sentence, const char* root_nonterminal, unsigned int k, double& probability);
+}
+
+wchar_t* get_string(JNIEnv* env, jstring str, size_t& char_count) {
+	const char* text = env->GetStringUTFChars(str, 0);
+	if (text == NULL) {
+		fprintf(stderr, "(JNI) get_string ERROR: Unable to retrieve Java string.\n");
+		return NULL;
+	}
+
+	char_count = mbstowcs(NULL, text, 0);
+	wchar_t* wide_str = (wchar_t*) malloc(sizeof(wchar_t) * (char_count + 1));
+	if (wide_str == NULL) {
+		fprintf(stderr, "(JNI) get_string ERROR: Insufficient memory for wide character string.\n");
+		env->ReleaseStringUTFChars(str, text);
+		return NULL;
+	}
+	mbstowcs(wide_str, text, char_count);
+
+	env->ReleaseStringUTFChars(str, text);
+	return wide_str;
 }
 
 JNIEXPORT jboolean JNICALL Java_edu_cmu_ml_rtw_micro_hdp_HDPParser_initialize(
@@ -35,15 +57,9 @@ JNIEXPORT jboolean JNICALL Java_edu_cmu_ml_rtw_micro_hdp_HDPParser_initialize(
 		env->ReleaseStringUTFChars(hdp_directory, data_path);
 		return false;
 	}
-	FILE* init_stream = fmemopen((char*) commands, strlen(commands) + 1, "r");
-	if (init_stream == NULL) {
-		fprintf(stderr, "(JNI) initialize ERROR: Unable to open in-memory stream.\n");
-		env->ReleaseStringUTFChars(hdp_directory, data_path);
-		env->ReleaseStringUTFChars(init_script, commands);
-		return false;
-	}
-	run_console(init_stream, "");
-	fclose(init_stream);
+
+	memory_stream stream(commands, (unsigned int) strlen(commands));
+	run_console_memory(stream, "");
 	env->ReleaseStringUTFChars(init_script, commands);
 
 	return true;

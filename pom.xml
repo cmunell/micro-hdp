@@ -11,7 +11,7 @@
     <plugins>
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.1</version>
+        <version>3.3</version>
         <configuration>
           <source>1.8</source>
           <target>1.8</target>  
@@ -20,6 +20,7 @@
       <plugin>
         <groupId>com.github.maven-nar</groupId>
         <artifactId>nar-maven-plugin</artifactId>
+        <version>3.2.3</version>
         <extensions>true</extensions>
         <configuration>
           <libraries>
@@ -37,6 +38,11 @@
               </lib>
             </libs>
           </linker>
+          <cpp>
+            <options>
+              <option>-std=c++11</option>
+            </options>
+          </cpp>
         </configuration>
       </plugin>
     </plugins>
