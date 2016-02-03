@@ -9,14 +9,14 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include <io.h>
+#include "io.h"
 
 extern "C" {
 void run_console_file(FILE* input, const char* prompt);
 void run_console_memory(memory_stream& input, const char* prompt);
 void set_memory_limit(long unsigned int new_limit);
 void set_data_path(const char* new_path);
-char* parse_sentence(const char* sentence, const char* root_nonterminal, unsigned int k, double& probability);
+char* parse_sentence(const char* sentence, const char* root_nonterminal, double log_k, double& probability);
 }
 
 wchar_t* get_string(JNIEnv* env, jstring str, size_t& char_count) {
@@ -66,7 +66,7 @@ JNIEXPORT jboolean JNICALL Java_edu_cmu_ml_rtw_micro_hdp_HDPParser_initialize(
 }
 
 JNIEXPORT jobject JNICALL Java_edu_cmu_ml_rtw_micro_hdp_HDPParser_annotate(
-		JNIEnv* env, jobject obj, jstring sentence, jstring root_nonterminal, jint k)
+		JNIEnv* env, jobject obj, jstring sentence, jstring root_nonterminal, jdouble log_k)
 {
 	const char* sentence_str = env->GetStringUTFChars(sentence, 0);
 	if (sentence_str == NULL) {
@@ -82,7 +82,7 @@ JNIEXPORT jobject JNICALL Java_edu_cmu_ml_rtw_micro_hdp_HDPParser_annotate(
 	}
 
 	double probability = 0.0;
-	char* result = parse_sentence(sentence_str, nonterminal, k, probability);
+	char* result = parse_sentence(sentence_str, nonterminal, log_k, probability);
 	if (result == NULL) {
 		env->ReleaseStringUTFChars(sentence, sentence_str);
 		env->ReleaseStringUTFChars(root_nonterminal, nonterminal);

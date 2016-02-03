@@ -25,10 +25,8 @@ import edu.cmu.ml.rtw.micro.hdp.NarSystem;
  */
 public class HDPParser implements AnnotatorSentence<String> {
 	private static final AnnotationType<?>[] REQUIRED_ANNOTATIONS = new AnnotationType<?>[] {
-		AnnotationTypeNLP.SENTENCE
-
-		// TODO: extract simpler subsentences from sentences that are too complex using dependency trees
-		//AnnotationTypeNLP.DEPENDENCY_PARSE
+		AnnotationTypeNLP.SENTENCE,
+		AnnotationTypeNLP.DEPENDENCY_PARSE
 	};
 
 	public static final AnnotationTypeNLP<String> SEMANTIC_PARSE = new AnnotationTypeNLP<String>("nell-hdp", String.class, Target.SENTENCE);
@@ -60,7 +58,7 @@ public class HDPParser implements AnnotatorSentence<String> {
 	}
 
 	private native boolean initialize(String initScript, String hdpDirectory, int memoryLimitGB);
-	private native Pair<String, Double> annotate(String sentence, String rootSymbol, int k);
+	private native Pair<String, Double> annotate(String sentence, String rootSymbol, double log_k);
 
 	@Override
 	public String getName() {
@@ -86,14 +84,16 @@ public class HDPParser implements AnnotatorSentence<String> {
 		String input = sentence.replace(" .", "").toLowerCase();
 		if (sentence.split("\\s+").length > 12)
 			return null;
-		return annotate(input, "S", 1);
+		return annotate(input, "S", 0.0);
 	}
 
 	@Override
 	public Map<Integer, Pair<String, Double>> annotate(DocumentNLP document) {
 		HashMap<Integer, Pair<String, Double>> annotations = new HashMap<Integer, Pair<String, Double>>();
 		for (int i = 0; i < document.getSentenceCount(); i++) {
-			Pair<String, Double> annotation = annotate(document.getSentence(i));
+			String svo = ExtractSVO.extract(document, document.getDependencyParse(i));
+			if (svo == null) continue;
+			Pair<String, Double> annotation = annotate(svo);
 			if (annotation != null)
 				annotations.put(i, annotation);
 		}
