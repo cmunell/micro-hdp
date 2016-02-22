@@ -30,7 +30,7 @@ public class HDPParserTest {
 		Pipeline hdpPipe = new Pipeline(parser);
 		PipelineNLP welded = pipe.weld(hdpPipe);
 
-		DocumentNLPMutable document = new DocumentNLPInMemory(new DataTools(), "test_document", "And a trip to Baghdad 's looter market only bears witness to the fact that criminals are ruling the roost in the post - Saddam era. The president would have exceeded his authority in giving to Cuba the returns from the export of oil. Ramirez will have been playing baseball. John McCain represents Arizona, too.");
+		DocumentNLPMutable document = new DocumentNLPInMemory(new DataTools(), "test_document", "And a trip to Baghdad 's looter market only bears witness to the fact that criminals are ruling the roost in the post - Saddam era. The president would have exceeded his authority in giving to Cuba the returns from the export of oil. Yesterday, Daniela Hantuchova defeated Serena Williams in the third round, but later lost to Maria Sharapova in the round of 16. Roger Federer beat Marcos Baghdatis, winning his second Australian Open title. Marat Safin had injured his knee earlier in the year, and could not attend to defend his title. As he recovers, Marat Safin will play tennis again in the US Open later this year. Ramirez will have been playing baseball. John McCain represents Arizona, too.");
 		document = welded.run(document);
 		for (int i = 0; i < document.getSentenceCount(); i++) {
 			String annotation = document.getSentenceAnnotation(HDPParser.SEMANTIC_PARSE, i);
